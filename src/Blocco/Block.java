@@ -67,6 +67,40 @@ public class Block {
 
 	}
 
+	public void dumpToFile(String fileName) {
+		String string = "*********************************************************\n" + "Block[" + height + "]->"
+				+ "[hash=" + hash + ", confirmations=" + confirmations + ", size=" + size + ", version=" + version
+				+ ", merkleroot=" + merkleroot + ", mint=" + mint + ", time=" + time + ", nonce=" + nonce + ", bits="
+				+ bits + ", difficulty=" + difficulty + ", blocktrust=" + blocktrust + ", chaintrust=" + chaintrust
+				+ ", previousBlockHash=" + previousBlockHash + ", nextBlockHash=" + nextBlockHash + ", flags=" + flags
+				+ ", proofhash=" + proofhash + ", entropyBit=" + entropyBit + ", modifier=" + modifier
+				+ ", modifierChecksum=" + modifierChecksum + ", tx=" + tx + ", signature=" + signature + "]\n"
+				+ "*********************************************************\n";
+
+		try (FileWriter fw = new FileWriter(fileName, true);
+				BufferedWriter bw = new BufferedWriter(fw);
+				PrintWriter out = new PrintWriter(bw)) {
+			out.println(string);
+
+		} catch (Exception e) {
+			System.out.println(e.getStackTrace());
+			System.out.println(e.getMessage());
+
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "*********************************************************\n" + "Block[" + height + "]->" + "[hash="
+				+ hash + ", confirmations=" + confirmations + ", size=" + size + ", version=" + version
+				+ ", merkleroot=" + merkleroot + ", mint=" + mint + ", time=" + time + ", nonce=" + nonce + ", bits="
+				+ bits + ", difficulty=" + difficulty + ", blocktrust=" + blocktrust + ", chaintrust=" + chaintrust
+				+ ", previousBlockHash=" + previousBlockHash + ", nextBlockHash=" + nextBlockHash + ", flags=" + flags
+				+ ", proofhash=" + proofhash + ", entropyBit=" + entropyBit + ", modifier=" + modifier
+				+ ", modifierChecksum=" + modifierChecksum + ", tx=" + tx + ", signature=" + signature + "]\n"
+				+ "*********************************************************\n";
+	}
+
 	public void addTx(Tx tx) {
 		this.tx.add(tx);
 	}
@@ -247,38 +281,6 @@ public class Block {
 		this.signature = signature;
 	}
 
-	public void dumpToFile(String fileName) {
-		String special = "*********************************************************\n";
-		String string = "Block[" + height + "]->" + "[hash=" + hash + ", confirmations=" + confirmations + ", size="
-				+ size + ", version=" + version + ", merkleroot=" + merkleroot + ", mint=" + mint + ", time=" + time
-				+ ", nonce=" + nonce + ", bits=" + bits + ", difficulty=" + difficulty + ", blocktrust=" + blocktrust
-				+ ", chaintrust=" + chaintrust + ", previousBlockHash=" + previousBlockHash + ", nextBlockHash="
-				+ nextBlockHash + ", flags=" + flags + ", proofhash=" + proofhash + ", entropyBit=" + entropyBit
-				+ ", modifier=" + modifier + ", modifierChecksum=" + modifierChecksum + ", tx=" + tx + ", signature="
-				+ signature + "]\n";
-
-		try (FileWriter fw = new FileWriter(fileName, true);
-				BufferedWriter bw = new BufferedWriter(fw);
-				PrintWriter out = new PrintWriter(bw)) {
-			out.println(special + string + special);
-
-		} catch (Exception e) {
-			System.out.println(e.getStackTrace());
-			System.out.println(e.getMessage());
-
-		}
-	}
-
-	@Override
-	public String toString() {
-		return "Block[" + height + "]->" + "[hash=" + hash + ", confirmations=" + confirmations + ", size=" + size
-				+ ", version=" + version + ", merkleroot=" + merkleroot + ", mint=" + mint + ", time=" + time
-				+ ", nonce=" + nonce + ", bits=" + bits + ", difficulty=" + difficulty + ", blocktrust=" + blocktrust
-				+ ", chaintrust=" + chaintrust + ", previousBlockHash=" + previousBlockHash + ", nextBlockHash="
-				+ nextBlockHash + ", flags=" + flags + ", proofhash=" + proofhash + ", entropyBit=" + entropyBit
-				+ ", modifier=" + modifier + ", modifierChecksum=" + modifierChecksum + ", tx=" + tx + ", signature="
-				+ signature + "]\n";
-	}
 	/*
 	 * public String toString() { return "Block[" + height + "]" + "{\nhash=" + hash
 	 * + "\n confirmations=" + confirmations + "\n size=" + size + "\n version=" +

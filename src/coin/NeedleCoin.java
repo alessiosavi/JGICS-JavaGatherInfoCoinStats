@@ -56,6 +56,7 @@ public class NeedleCoin {
 	 * @param blockStop
 	 * @throws MalformedURLException
 	 */
+	@SuppressWarnings("unused")
 	private void syncChain(int blockStart, int blockStop) throws MalformedURLException {
 		String blockHash;
 		logger.info("*** STARTED SYNC CHAIN *** \n");
@@ -82,7 +83,7 @@ public class NeedleCoin {
 
 		heightChain = Integer.valueOf((String) Util.getJSON(apiCommands.get("getblockcount")));
 		logger.info("Initializing sync:\n Total block -> " + heightChain + "\n");
-		int myBlock = 87655;
+		int myBlock = 1;
 		while (myBlock < heightChain) {
 			logger.debug("Fetching block " + myBlock + "\n");
 			blockHash = Util.getBlockHash(myBlock, apiCommands.get("getblockhash"));
@@ -90,6 +91,7 @@ public class NeedleCoin {
 			blocco = Util.parseBlock(blockRAW);
 			blocco.dumpToFile(NDC_LOG);
 			blockchain.add(blocco);
+			logger.debug(blocco.toString());
 			myBlock++;
 		}
 	}

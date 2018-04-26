@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 
 import Blocco.Block;
 import Blocco.ScriptPubKey;
@@ -115,45 +115,17 @@ public class Util {
 	public static Tx parseTx(String apiMethods, String TX) throws MalformedURLException {
 		String[] link = new String[1]; // apiMethods splitted
 		String urlAPI;// composed by splitting apiMethods & concatenating with TX
-		JsonObject jsonTx, jsonVin, jsonVout; // Tx in JsonObject format
-		Tx tx; // return object
-		Vin vin;
-		Vout vout;
-		link = apiMethods.split("&");
-		urlAPI = link[0] + TX + "&" + link[1];
-		jsonTx = (JsonObject) getJSON(urlAPI);
-		tx = new Tx(jsonTx.get("hex"), jsonTx.get("txid"), jsonTx.get("version"), jsonTx.get("time").toString(),
-				jsonTx.get("locktime"), jsonTx.get("blockhash"), jsonTx.get("confirmations"),
-				jsonTx.get("blocktime").toString());
-		vin = new Vin(jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("coinbase"),
-				jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("sequence"));
-
-		ScriptPubKey scriptPubKey = new ScriptPubKey(
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
-						.get("asm"),
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
-						.get("hex"),
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
-						.get("type"));
-		vout = new Vout(jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("value"),
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("n"), scriptPubKey);
-		tx.setVoutList(vout);
-		tx.setVinList(vin);
-		return tx;
-	}
-
-	public static Tx parseTx(String TX) throws MalformedURLException {
-
-		String[] link = new String[1]; // apiMethods splitted
-		String urlAPI;// composed by splitting apiMethods & concatenating with TX
 		JsonObject jsonTx; // Tx in JsonObject format
 		Tx tx; // return object
 		Vin vin = new Vin();
-		Vout vout = new Vout();
-		link = transaction.split("&");
+		Vout vout;
+		List<String> addressList = new ArrayList<String>();
+		ScriptPubKey scriptPubKey;
+
+		link = apiMethods.split("&");
 		urlAPI = link[0] + TX + "&" + link[1];
-		urlAPI = urlAPI.replace("\"", "");
 		jsonTx = (JsonObject) getJSON(urlAPI);
+
 		tx = new Tx(jsonTx.get("hex"), jsonTx.get("txid"), jsonTx.get("version"), jsonTx.get("time").toString(),
 				jsonTx.get("locktime"), jsonTx.get("blockhash"), jsonTx.get("confirmations"),
 				jsonTx.get("blocktime").toString());
@@ -164,8 +136,9 @@ public class Util {
 			} catch (NullPointerException e) {
 			}
 		}
+		tx.setVinList(vin);
 
-		ScriptPubKey scriptPubKey = new ScriptPubKey(
+		scriptPubKey = new ScriptPubKey(
 				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
 						.get("asm"),
 				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
@@ -174,9 +147,70 @@ public class Util {
 						.get("type"));
 		vout = new Vout(jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("value"),
 				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("n"), scriptPubKey);
+
+		if (jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
+				.get("addresses") != null) {
+			for (JsonElement string : jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey")
+					.getAsJsonObject().get("addresses").getAsJsonArray()) {
+				logger.info("*** Address -> " + string.toString().replace("\"", "") + " *** \n");
+				addressList.add(string.toString().replace("\"", ""));
+			}
+		}
+		scriptPubKey.setAddresses(addressList);
 		tx.setVoutList(vout);
+		// logger.debug(tx + "\n");
+		return tx;
+	}
+
+	public static Tx parseTx(String TX) throws MalformedURLException {
+
+		String[] link = new String[1]; // apiMethods splitted
+		String urlAPI;// composed by splitting apiMethods & concatenating with TX
+		JsonObject jsonTx; // Tx in JsonObject format
+		Tx tx; // return object
+		Vin vin = new Vin();
+		Vout vout;
+		List<String> addressList = new ArrayList<String>();
+		ScriptPubKey scriptPubKey;
+		link = transaction.split("&");
+		urlAPI = link[0] + TX + "&" + link[1];
+		urlAPI = urlAPI.replace("\"", "");
+		jsonTx = (JsonObject) getJSON(urlAPI);
+
+		tx = new Tx(jsonTx.get("hex"), jsonTx.get("txid"), jsonTx.get("version"), jsonTx.get("time").toString(),
+				jsonTx.get("locktime"), jsonTx.get("blockhash"), jsonTx.get("confirmations"),
+				jsonTx.get("blocktime").toString());
+		if (jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject() != null) {
+			try {
+				vin = new Vin(jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("coinbase"),
+						jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("sequence"));
+			} catch (NullPointerException e) {
+			}
+		}
 		tx.setVinList(vin);
-		logger.debug(tx + "\n");
+
+		scriptPubKey = new ScriptPubKey(
+				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
+						.get("asm"),
+				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
+						.get("hex"),
+				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
+						.get("type"));
+		vout = new Vout(jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("value"),
+				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("n"), scriptPubKey);
+
+		if (jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
+				.get("addresses") != null) {
+			for (JsonElement string : jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey")
+					.getAsJsonObject().get("addresses").getAsJsonArray()) {
+				// logger.info("*** Address -> " + string.toString().replace("\"", "") + " ***
+				// \n");
+				addressList.add(string.toString().replace("\"", ""));
+			}
+		}
+		scriptPubKey.setAddresses(addressList);
+		tx.setVoutList(vout);
+		//logger.debug(tx + "\n");
 		return tx;
 	}
 

@@ -271,13 +271,25 @@ public class Block {
 
 	@Override
 	public String toString() {
-		return "Block[" + height + "]" + "{\nhash=" + hash + "\n confirmations=" + confirmations + "\n size=" + size
-				+ "\n version=" + version + "\n merkleroot=" + merkleroot + "\n mint=" + mint + "\n time=" + time
-				+ "\n nonce=" + nonce + "\n bits=" + bits + "\n difficulty=" + difficulty + "\n blocktrust="
-				+ blocktrust + "\n chaintrust=" + chaintrust + "\n previousBlockHash=" + previousBlockHash
-				+ "\n nextBlockHash=" + nextBlockHash + "\n flags=" + flags + "\n proofhash=" + proofhash
-				+ "\n entropyBit=" + entropyBit + "\n modifier=" + modifier + "\n modifierChecksum=" + modifierChecksum
-				+ "\n tx=" + tx + "\n signature=" + signature + "\n}";
+		return "Block[" + height + "]->" + "[hash=" + hash + ", confirmations=" + confirmations + ", size=" + size
+				+ ", version=" + version + ", merkleroot=" + merkleroot + ", mint=" + mint + ", time=" + time
+				+ ", nonce=" + nonce + ", bits=" + bits + ", difficulty=" + difficulty + ", blocktrust=" + blocktrust
+				+ ", chaintrust=" + chaintrust + ", previousBlockHash=" + previousBlockHash + ", nextBlockHash="
+				+ nextBlockHash + ", flags=" + flags + ", proofhash=" + proofhash + ", entropyBit=" + entropyBit
+				+ ", modifier=" + modifier + ", modifierChecksum=" + modifierChecksum + ", tx=" + tx + ", signature="
+				+ signature + "]\n";
 	}
+	/*
+	 * public String toString() { return "Block[" + height + "]" + "{\nhash=" + hash
+	 * + "\n confirmations=" + confirmations + "\n size=" + size + "\n version=" +
+	 * version + "\n merkleroot=" + merkleroot + "\n mint=" + mint + "\n time=" +
+	 * time + "\n nonce=" + nonce + "\n bits=" + bits + "\n difficulty=" +
+	 * difficulty + "\n blocktrust=" + blocktrust + "\n chaintrust=" + chaintrust +
+	 * "\n previousBlockHash=" + previousBlockHash + "\n nextBlockHash=" +
+	 * nextBlockHash + "\n flags=" + flags + "\n proofhash=" + proofhash +
+	 * "\n entropyBit=" + entropyBit + "\n modifier=" + modifier +
+	 * "\n modifierChecksum=" + modifierChecksum + "\n tx=" + tx + "\n signature=" +
+	 * signature + "\n}"; }
+	 */
 
 }

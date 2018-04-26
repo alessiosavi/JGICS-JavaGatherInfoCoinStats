@@ -15,7 +15,6 @@ public class Vin {
 	public Vin(JsonElement coinbase, JsonElement sequence) {
 		this.coinbase = coinbase.toString();
 		this.sequence = Double.valueOf(sequence.toString());
-		this.toString();
 	}
 
 	public Vin() {

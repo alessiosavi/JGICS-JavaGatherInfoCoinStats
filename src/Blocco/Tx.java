@@ -112,9 +112,9 @@ public class Tx {
 
 	@Override
 	public String toString() {
-		String string = "Hex :" + hex + "\ntxid :" + txId + "\nversion :" + version + "\ntime :" + time + "\nlocktime :"
-				+ locktime + "\nblockhash :" + blockhash + "\nconfirmations :" + confirmations + "\nblocktime :"
-				+ blocktime + "\nvin :" + vinList.toString() + "\nvout :" + voutList.toString();
+		String string = "Hex :" + hex + ", txid :" + txId + ", version :" + version + ", time :" + time + ", locktime :"
+				+ locktime + ", blockhash :" + blockhash + ", confirmations :" + confirmations + ", blocktime :" + blocktime
+				+ ", vin :" + vinList.toString() + ", vout :" + voutList.toString();
 		return string;
 	}
 

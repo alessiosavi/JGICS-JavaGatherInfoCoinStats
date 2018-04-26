@@ -146,7 +146,7 @@ public class Util {
 
 		String[] link = new String[1]; // apiMethods splitted
 		String urlAPI;// composed by splitting apiMethods & concatenating with TX
-		JsonObject jsonTx, jsonVin, jsonVout; // Tx in JsonObject format
+		JsonObject jsonTx; // Tx in JsonObject format
 		Tx tx; // return object
 		Vin vin = new Vin();
 		Vout vout = new Vout();
@@ -161,7 +161,7 @@ public class Util {
 			try {
 				vin = new Vin(jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("coinbase"),
 						jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("sequence"));
-			} catch (Exception e) {
+			} catch (NullPointerException e) {
 			}
 		}
 

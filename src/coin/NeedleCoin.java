@@ -82,7 +82,7 @@ public class NeedleCoin {
 
 		heightChain = Integer.valueOf((String) Util.getJSON(apiCommands.get("getblockcount")));
 		logger.info("Initializing sync:\n Total block -> " + heightChain + "\n");
-		int myBlock = 51315;
+		int myBlock = 87655;
 		while (myBlock < heightChain) {
 			logger.debug("Fetching block " + myBlock + "\n");
 			blockHash = Util.getBlockHash(myBlock, apiCommands.get("getblockhash"));

@@ -16,7 +16,8 @@ import util.Util;
 
 public class NeedleCoin {
 
-	private static String NDC_LOG = "/home/IT059959/eclipse-workspace/JGICS - JavaGatherInfoCoinStats/LOG/NDC/ndcDump";
+	private String NDC_LOG;
+	private static String FILE_NAME = "ndcDump";
 
 	private Logger logger = LogManager.getLogger(NeedleCoin.class);
 
@@ -28,22 +29,36 @@ public class NeedleCoin {
 	private String urlExplorer = "http://79.20.51.52:28017/";
 	private Map<String, String> apiCommands = new HashMap<String, String>(); // contains the api command
 
-	public NeedleCoin() throws MalformedURLException {
+	/**
+	 * The constructor initialize the object setting the properly path
+	 * 
+	 * @param path
+	 * @throws MalformedURLException
+	 */
+	public NeedleCoin(String path) throws MalformedURLException {
+		if (path.lastIndexOf("/") < path.length() - 1) {
+			NDC_LOG = path + "/" + FILE_NAME;
+		} else {
+			NDC_LOG = path + FILE_NAME;
+
+		}
 		logger.info("Needle Coin Created\n");
+		logger.info("PATH -> " + NDC_LOG);
 		blockchain = new ArrayList<Block>();
 		populateApiMap();
 		syncChain();
 	}
 
 	/**
+	 * This method download the portion of chain between the 2 input parameters
 	 * 
 	 * @param blockStart
 	 * @param blockStop
 	 * @throws MalformedURLException
 	 */
-	@SuppressWarnings("unused")
 	private void syncChain(int blockStart, int blockStop) throws MalformedURLException {
 		String blockHash;
+		logger.info("*** STARTED SYNC CHAIN *** \n");
 		for (int i = blockStart; i < blockStop; i++) {
 			blockHash = Util.getBlockHash(i, apiCommands.get("getblockhash"));
 			JsonObject blockRAW = (JsonObject) Util.getJSON(apiCommands.get("getblock") + blockHash);
@@ -54,13 +69,20 @@ public class NeedleCoin {
 
 	}
 
+	/**
+	 * This method download the complete chain from a given start number
+	 * 
+	 * @throws MalformedURLException
+	 */
 	public void syncChain() throws MalformedURLException {
 		String blockHash;
 		JsonObject blockRAW;
 		Block blocco;
+		logger.info("*** STARTED SYNC CHAIN *** \n");
+
 		heightChain = Integer.valueOf((String) Util.getJSON(apiCommands.get("getblockcount")));
 		logger.info("Initializing sync:\n Total block -> " + heightChain + "\n");
-		int myBlock = 7523;
+		int myBlock = 51315;
 		while (myBlock < heightChain) {
 			logger.debug("Fetching block " + myBlock + "\n");
 			blockHash = Util.getBlockHash(myBlock, apiCommands.get("getblockhash"));
@@ -77,6 +99,7 @@ public class NeedleCoin {
 	 * gettransactions have to splitted by "&" character for insert the hash value
 	 */
 	private void populateApiMap() {
+		logger.info("*** INITIALIZE API MAP *** \n");
 		apiCommands.put("getdifficulty", urlExplorer + "api/getdifficulty");
 		apiCommands.put("getconnectioncount", urlExplorer + "api/getconnectioncount");
 		apiCommands.put("getblockcount", urlExplorer + "api/getblockcount");

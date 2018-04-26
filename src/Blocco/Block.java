@@ -67,6 +67,10 @@ public class Block {
 
 	}
 
+	public void addTx(Tx tx) {
+		this.tx.add(tx);
+	}
+
 	public String getHash() {
 		return hash;
 	}
@@ -154,7 +158,6 @@ public class Block {
 	public void setDifficulty(float difficulty) {
 		this.difficulty = difficulty;
 	}
-
 
 	public String getBlocktrust() {
 		return blocktrust;
@@ -244,7 +247,7 @@ public class Block {
 		this.signature = signature;
 	}
 
-	public boolean dumpToFile(String fileName) {
+	public void dumpToFile(String fileName) {
 		String special = "*********************************************************\n";
 		String string = "Block[" + height + "]->" + "[hash=" + hash + ", confirmations=" + confirmations + ", size="
 				+ size + ", version=" + version + ", merkleroot=" + merkleroot + ", mint=" + mint + ", time=" + time
@@ -258,12 +261,10 @@ public class Block {
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
 			out.println(special + string + special);
-			return true;
 
 		} catch (Exception e) {
 			System.out.println(e.getStackTrace());
 			System.out.println(e.getMessage());
-			return false;
 
 		}
 	}

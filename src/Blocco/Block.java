@@ -67,6 +67,11 @@ public class Block {
 
 	}
 
+	/**
+	 * Take in input the file name, the path is setted as first input parameter
+	 * 
+	 * @param fileName
+	 */
 	public void dumpToFile(String fileName) {
 		String string = "*********************************************************\n" + "Block[" + height + "]->"
 				+ "[hash=" + hash + ", confirmations=" + confirmations + ", size=" + size + ", version=" + version

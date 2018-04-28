@@ -7,7 +7,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +26,8 @@ import Blocco.Vout;
 
 public class Util {
 	public static String transaction = "http://79.20.51.52:28017/api/getrawtransaction?txid=&decrypt=1";
-	private static Logger logger = LogManager.getLogger(Util.class);
+	public static Logger logger = LogManager.getLogger(Util.class);
+	private static Map<String, String> apiCommands = new HashMap<String, String>(); // contains the api command
 
 	public static String tx2 = "48621f85969b053f04e572977d57f4944244cb2247694d0b2566a3fe2b162945";
 
@@ -100,6 +103,7 @@ public class Util {
 			String string = je.toString();
 			blocco.addTx(parseTx(string));
 		}
+		//logger.info("BLOCK NUMBER --> " + blocco.getHeight() + "\n");
 		return blocco;
 	}
 
@@ -152,7 +156,7 @@ public class Util {
 				.get("addresses") != null) {
 			for (JsonElement string : jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey")
 					.getAsJsonObject().get("addresses").getAsJsonArray()) {
-				logger.info("*** Address -> " + string.toString().replace("\"", "") + " *** \n");
+				//logger.info("*** Address -> " + string.toString().replace("\"", "") + " *** \n");
 				addressList.add(string.toString().replace("\"", ""));
 			}
 		}
@@ -185,6 +189,7 @@ public class Util {
 				vin = new Vin(jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("coinbase"),
 						jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("sequence"));
 			} catch (NullPointerException e) {
+				System.err.println();
 			}
 		}
 		tx.setVinList(vin);
@@ -210,8 +215,31 @@ public class Util {
 		}
 		scriptPubKey.setAddresses(addressList);
 		tx.setVoutList(vout);
-		//logger.debug(tx + "\n");
+		// logger.debug(tx + "\n");
 		return tx;
+	}
+
+	/**
+	 * Populate the map with the url of every Explorer methods getRAWtransaction &&
+	 * gettransactions have to splitted by "&" character for insert the hash value
+	 */
+	public static Map<String, String> populateApiMap() {
+		String urlExplorer = "http://79.20.51.52:28017/";
+		// logger.info("*** INITIALIZE API MAP *** \n");
+		apiCommands.put("getdifficulty", urlExplorer + "api/getdifficulty");
+		apiCommands.put("getconnectioncount", urlExplorer + "api/getconnectioncount");
+		apiCommands.put("getblockcount", urlExplorer + "api/getblockcount");
+		apiCommands.put("getblockhash", urlExplorer + "api/getblockhash?index=");
+		apiCommands.put("getblock", urlExplorer + "api/getblock?hash=");
+		apiCommands.put("getRAWtransaction", urlExplorer + "api/getrawtransaction?txid=&decrypt=0");// split for &
+		apiCommands.put("gettransaction", urlExplorer + "api/getrawtransaction?txid=&decrypt=1");// split for &
+		apiCommands.put("getnetworkhashps ", urlExplorer + "api/getnetworkhashps");
+		apiCommands.put("getmoneysupply", urlExplorer + "ext/getmoneysupply");
+		apiCommands.put("getdistribution ", urlExplorer + "ext/getdistribution ");
+		apiCommands.put("getaddress", urlExplorer + "ext/getaddress/");
+		apiCommands.put("getbalance", urlExplorer + "ext/getbalance/");
+		apiCommands.put("getlasttxs", urlExplorer + "ext/getlasttxs/10/100"); // return tx
+		return apiCommands;
 	}
 
 }

@@ -4,12 +4,10 @@ import com.google.gson.JsonElement;
 
 public class Vin {
 
-	String coinbase;
-	double sequence;
+	public String coinbase;
+	public double sequence;
 
-	@Override
-	public String toString() {
-		return "Vin [coinbase=" + coinbase + ", sequence=" + sequence + "]";
+	public Vin() {
 	}
 
 	public Vin(JsonElement coinbase, JsonElement sequence) {
@@ -17,23 +15,25 @@ public class Vin {
 		this.sequence = Double.valueOf(sequence.toString());
 	}
 
-	public Vin() {
-	}
-
 	public String getCoinbase() {
 		return coinbase;
-	}
-
-	public void setCoinbase(String coinbase) {
-		this.coinbase = coinbase;
 	}
 
 	public double getSequence() {
 		return sequence;
 	}
 
+	public void setCoinbase(String coinbase) {
+		this.coinbase = coinbase;
+	}
+
 	public void setSequence(double sequence) {
 		this.sequence = sequence;
+	}
+
+	@Override
+	public String toString() {
+		return "Vin [coinbase=" + coinbase + ", sequence=" + sequence + "]";
 	}
 
 }

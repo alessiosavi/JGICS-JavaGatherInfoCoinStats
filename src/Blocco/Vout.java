@@ -1,14 +1,13 @@
 package Blocco;
 
-import org.apache.logging.log4j.Logger;
-
 import com.google.gson.JsonElement;
 
 public class Vout {
-	private static Logger logger;
 
 	float value;
+
 	int n;
+
 	ScriptPubKey scriptPubKey = new ScriptPubKey();
 
 	public Vout() {
@@ -21,36 +20,28 @@ public class Vout {
 		this.scriptPubKey = scriptPubKey;
 	}
 
-	public static Logger getLogger() {
-		return logger;
-	}
-
-	public static void setLogger(Logger logger) {
-		Vout.logger = logger;
-	}
-
-	public float getValue() {
-		return value;
-	}
-
-	public void setValue(float value) {
-		this.value = value;
-	}
-
 	public int getN() {
 		return n;
-	}
-
-	public void setN(int n) {
-		this.n = n;
 	}
 
 	public ScriptPubKey getScriptPubKey() {
 		return scriptPubKey;
 	}
 
+	public float getValue() {
+		return value;
+	}
+
+	public void setN(int n) {
+		this.n = n;
+	}
+
 	public void setScriptPubKey(ScriptPubKey scriptPubKey) {
 		this.scriptPubKey = scriptPubKey;
+	}
+
+	public void setValue(float value) {
+		this.value = value;
 	}
 
 	@Override

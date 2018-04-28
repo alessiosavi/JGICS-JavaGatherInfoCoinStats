@@ -34,6 +34,10 @@ public class Block {
 	private List<Tx> tx = new ArrayList<Tx>();
 	private String signature;
 
+	public Block() {
+
+	}
+
 	public Block(JsonElement hash, JsonElement confirmations, JsonElement size, JsonElement height, JsonElement version,
 			JsonElement merkleroot, JsonElement mint, String time, JsonElement nonce, JsonElement bits,
 			JsonElement difficulty, JsonElement blocktrust, JsonElement chaintrust, JsonElement previousBlockHash,
@@ -63,12 +67,18 @@ public class Block {
 		this.signature = "";
 	}
 
-	public Block() {
-
+	/**
+	 * Add a Tx object to the current list
+	 * 
+	 * @param tx
+	 */
+	public void addTx(Tx tx) {
+		this.tx.add(tx);
 	}
 
 	/**
-	 * Take in input the file name, the path is setted as first input parameter
+	 * Take in input the file name. The path is setted as first input parameter in
+	 * Main
 	 * 
 	 * @param fileName
 	 */
@@ -94,6 +104,182 @@ public class Block {
 		}
 	}
 
+	public String getBits() {
+		return bits;
+	}
+
+	public String getBlocktrust() {
+		return blocktrust;
+	}
+
+	public String getChaintrust() {
+		return chaintrust;
+	}
+
+	public int getConfirmations() {
+		return confirmations;
+	}
+
+	public float getDifficulty() {
+		return difficulty;
+	}
+
+	public int getEntropyBit() {
+		return entropyBit;
+	}
+
+	public String getFlags() {
+		return flags;
+	}
+
+	public String getHash() {
+		return hash;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public String getMerkleroot() {
+		return merkleroot;
+	}
+
+	public float getMint() {
+		return mint;
+	}
+
+	public String getModifier() {
+		return modifier;
+	}
+
+	public String getModifierChecksum() {
+		return modifierChecksum;
+	}
+
+	public String getNextBlockHash() {
+		return nextBlockHash;
+	}
+
+	public int getNonce() {
+		return nonce;
+	}
+
+	public String getPreviousBlockHash() {
+		return previousBlockHash;
+	}
+
+	public String getProofhash() {
+		return proofhash;
+	}
+
+	public String getSignature() {
+		return signature;
+	}
+
+	public int getSize() {
+		return size;
+	}
+
+	public Date getTime() {
+		return time;
+	}
+
+	public List<Tx> getTx() {
+		return tx;
+	}
+
+	public int getVersion() {
+		return version;
+	}
+
+	public void setBits(String bits) {
+		this.bits = bits;
+	}
+
+	public void setBlocktrust(String blocktrust) {
+		this.blocktrust = blocktrust;
+	}
+
+	public void setChaintrust(String chaintrust) {
+		this.chaintrust = chaintrust;
+	}
+
+	public void setConfirmations(int confirmations) {
+		this.confirmations = confirmations;
+	}
+
+	public void setDifficulty(float difficulty) {
+		this.difficulty = difficulty;
+	}
+
+	public void setEntropyBit(int entropyBit) {
+		this.entropyBit = entropyBit;
+	}
+
+	public void setFlags(String flags) {
+		this.flags = flags;
+	}
+
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public void setMerkleroot(String merkleroot) {
+		this.merkleroot = merkleroot;
+	}
+
+	public void setMint(float mint) {
+		this.mint = mint;
+	}
+
+	public void setModifier(String modifier) {
+		this.modifier = modifier;
+	}
+
+	public void setModifierChecksum(String modifierChecksum) {
+		this.modifierChecksum = modifierChecksum;
+	}
+
+	public void setNextBlockHash(String nextBlockHash) {
+		this.nextBlockHash = nextBlockHash;
+	}
+
+	public void setNonce(int nonce) {
+		this.nonce = nonce;
+	}
+
+	public void setPreviousBlockHash(String previousBlockHash) {
+		this.previousBlockHash = previousBlockHash;
+	}
+
+	public void setProofhash(String proofhash) {
+		this.proofhash = proofhash;
+	}
+
+	public void setSignature(String signature) {
+		this.signature = signature;
+	}
+
+	public void setSize(int size) {
+		this.size = size;
+	}
+
+	public void setTime(Date time) {
+		this.time = time;
+	}
+
+	public void setTx(List<Tx> tx) {
+		this.tx = tx;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
+	}
+
 	@Override
 	public String toString() {
 		return "*********************************************************\n" + "Block[" + height + "]->" + "[hash="
@@ -105,198 +291,5 @@ public class Block {
 				+ ", modifierChecksum=" + modifierChecksum + ", tx=" + tx + ", signature=" + signature + "]\n"
 				+ "*********************************************************\n";
 	}
-
-	public void addTx(Tx tx) {
-		this.tx.add(tx);
-	}
-
-	public String getHash() {
-		return hash;
-	}
-
-	public void setHash(String hash) {
-		this.hash = hash;
-	}
-
-	public int getConfirmations() {
-		return confirmations;
-	}
-
-	public void setConfirmations(int confirmations) {
-		this.confirmations = confirmations;
-	}
-
-	public int getSize() {
-		return size;
-	}
-
-	public void setSize(int size) {
-		this.size = size;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	public int getVersion() {
-		return version;
-	}
-
-	public void setVersion(int version) {
-		this.version = version;
-	}
-
-	public String getMerkleroot() {
-		return merkleroot;
-	}
-
-	public void setMerkleroot(String merkleroot) {
-		this.merkleroot = merkleroot;
-	}
-
-	public float getMint() {
-		return mint;
-	}
-
-	public void setMint(float mint) {
-		this.mint = mint;
-	}
-
-	public Date getTime() {
-		return time;
-	}
-
-	public void setTime(Date time) {
-		this.time = time;
-	}
-
-	public int getNonce() {
-		return nonce;
-	}
-
-	public void setNonce(int nonce) {
-		this.nonce = nonce;
-	}
-
-	public String getBits() {
-		return bits;
-	}
-
-	public void setBits(String bits) {
-		this.bits = bits;
-	}
-
-	public float getDifficulty() {
-		return difficulty;
-	}
-
-	public void setDifficulty(float difficulty) {
-		this.difficulty = difficulty;
-	}
-
-	public String getBlocktrust() {
-		return blocktrust;
-	}
-
-	public void setBlocktrust(String blocktrust) {
-		this.blocktrust = blocktrust;
-	}
-
-	public String getChaintrust() {
-		return chaintrust;
-	}
-
-	public void setChaintrust(String chaintrust) {
-		this.chaintrust = chaintrust;
-	}
-
-	public String getPreviousBlockHash() {
-		return previousBlockHash;
-	}
-
-	public void setPreviousBlockHash(String previousBlockHash) {
-		this.previousBlockHash = previousBlockHash;
-	}
-
-	public String getNextBlockHash() {
-		return nextBlockHash;
-	}
-
-	public void setNextBlockHash(String nextBlockHash) {
-		this.nextBlockHash = nextBlockHash;
-	}
-
-	public String getFlags() {
-		return flags;
-	}
-
-	public void setFlags(String flags) {
-		this.flags = flags;
-	}
-
-	public String getProofhash() {
-		return proofhash;
-	}
-
-	public void setProofhash(String proofhash) {
-		this.proofhash = proofhash;
-	}
-
-	public int getEntropyBit() {
-		return entropyBit;
-	}
-
-	public void setEntropyBit(int entropyBit) {
-		this.entropyBit = entropyBit;
-	}
-
-	public String getModifier() {
-		return modifier;
-	}
-
-	public void setModifier(String modifier) {
-		this.modifier = modifier;
-	}
-
-	public String getModifierChecksum() {
-		return modifierChecksum;
-	}
-
-	public void setModifierChecksum(String modifierChecksum) {
-		this.modifierChecksum = modifierChecksum;
-	}
-
-	public List<Tx> getTx() {
-		return tx;
-	}
-
-	public void setTx(List<Tx> tx) {
-		this.tx = tx;
-	}
-
-	public String getSignature() {
-		return signature;
-	}
-
-	public void setSignature(String signature) {
-		this.signature = signature;
-	}
-
-	/*
-	 * public String toString() { return "Block[" + height + "]" + "{\nhash=" + hash
-	 * + "\n confirmations=" + confirmations + "\n size=" + size + "\n version=" +
-	 * version + "\n merkleroot=" + merkleroot + "\n mint=" + mint + "\n time=" +
-	 * time + "\n nonce=" + nonce + "\n bits=" + bits + "\n difficulty=" +
-	 * difficulty + "\n blocktrust=" + blocktrust + "\n chaintrust=" + chaintrust +
-	 * "\n previousBlockHash=" + previousBlockHash + "\n nextBlockHash=" +
-	 * nextBlockHash + "\n flags=" + flags + "\n proofhash=" + proofhash +
-	 * "\n entropyBit=" + entropyBit + "\n modifier=" + modifier +
-	 * "\n modifierChecksum=" + modifierChecksum + "\n tx=" + tx + "\n signature=" +
-	 * signature + "\n}"; }
-	 */
 
 }

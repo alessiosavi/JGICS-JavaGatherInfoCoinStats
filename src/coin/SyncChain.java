@@ -37,13 +37,37 @@ public class SyncChain extends Thread {
 		this.blockStop = blockStop;
 	}
 
-	public List<Block> syncChainNeedleCoin(int blockStart, int blockStop) throws MalformedURLException {
-		while (blockStart < blockStop) {
-			blockchainPiece = this.syncChain(blockStart, blockStop);
-			blockStart++;
-		}
+	public List<Block> getBlockchainPiece() {
 		return blockchainPiece;
+	}
 
+	public int getBlockStart() {
+		return blockStart;
+	}
+
+	public int getBlockStop() {
+		return blockStop;
+	}
+
+	public void run() {
+		try {
+			blockchainPiece = syncChain(this.blockStart, this.blockStop);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void setBlockchainPiece(List<Block> blockchainPiece) {
+		this.blockchainPiece = blockchainPiece;
+	}
+
+	public void setBlockStart(int blockStart) {
+		this.blockStart = blockStart;
+	}
+
+	public void setBlockStop(int blockStop) {
+		this.blockStop = blockStop;
 	}
 
 	/**
@@ -57,56 +81,25 @@ public class SyncChain extends Thread {
 		String blockHash;
 		JsonObject blockRAW;
 		Block blocco;
-		// logger.info("*** STARTED SYNC CHAIN *** \n");
-
-		// logger.info("Initializing sync:\n Ging to download from " + blockStart + " To
-		// -> " + blockStop);
 		while (blockStart <= blockStop) {
-			// logger.debug("Fetching block " + blockStart + "\n");
 			blockHash = Util.getBlockHash(blockStart, Util.populateApiMap().get("getblockhash"));
 			blockRAW = (JsonObject) Util.getJSON(Util.populateApiMap().get("getblock") + blockHash);
 			blocco = Util.parseBlock(blockRAW);
 			blocco.dumpToFile("ndcDump");
 			blockchainPiece.add(blocco);
-			// logger.debug(blocco.toString());
+			logger.debug(blocco.toString() + "\n");
 			blockStart++;
 		}
 		return blockchainPiece;
 	}
 
-	public void run() {
-		try {
-			blockchainPiece = syncChain(this.blockStart, this.blockStop);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public List<Block> syncChainNeedleCoin(int blockStart, int blockStop) throws MalformedURLException {
+		while (blockStart < blockStop) {
+			blockchainPiece = this.syncChain(blockStart, blockStop);
+			blockStart++;
 		}
-
-	}
-
-	public int getBlockStart() {
-		return blockStart;
-	}
-
-	public void setBlockStart(int blockStart) {
-		this.blockStart = blockStart;
-	}
-
-	public int getBlockStop() {
-		return blockStop;
-	}
-
-	public void setBlockStop(int blockStop) {
-		this.blockStop = blockStop;
-	}
-
-	public List<Block> getBlockchainPiece() {
 		return blockchainPiece;
+
 	}
 
-	public void setBlockchainPiece(List<Block> blockchainPiece) {
-		this.blockchainPiece = blockchainPiece;
-	}
-
-	
 }

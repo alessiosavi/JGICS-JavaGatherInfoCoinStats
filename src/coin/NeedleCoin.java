@@ -14,14 +14,13 @@ import util.Util;
 
 public class NeedleCoin {
 
-	public static String NDC_LOG;
-	public static String FILE_NAME = "ndcDump";
+	public String NDC_LOG;
+	public String FILE_NAME = "ndcDump";
 
-	public static Logger logger = LogManager.getLogger(NeedleCoin.class);
+	public Logger logger = LogManager.getLogger(NeedleCoin.class);
 
 	public String name = "NeedleCoin";
 	public String ticker = "NDC";
-	public List<String> marketList;
 	public List<Block> blockchain;
 	public int heightChain;
 	public String urlExplorer = "http://79.20.51.52:28017/";
@@ -50,6 +49,60 @@ public class NeedleCoin {
 		}
 	}
 
+	public void addBlockchainPiece(List<Block> blockchainPiece) {
+		this.blockchain.addAll(blockchainPiece);
+	}
+
+	public List<Block> getBlockchain() {
+		return blockchain;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getTicker() {
+		return ticker;
+	}
+
+	public void setBlockchain(List<Block> blockchain) {
+		this.blockchain.addAll(blockchain);
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setTicker(String ticker) {
+		this.ticker = ticker;
+	}
+
+	/**
+	 * This method download the complete chain from a given start number
+	 * 
+	 * @throws MalformedURLException
+	 */
+	public void syncChain() throws MalformedURLException {
+		String blockHash;
+		JsonObject blockRAW;
+		Block blocco;
+		logger.info("*** STARTED SYNC CHAIN *** \n");
+
+		heightChain = Integer.valueOf((String) Util.getJSON(Util.populateApiMap().get("getblockcount")));
+		// logger.info("Initializing sync:\n Total block -> " + heightChain + "\n");
+		int myBlock = 1;
+		while (myBlock < heightChain) {
+			// logger.debug("Fetching block " + myBlock + "\n");
+			blockHash = Util.getBlockHash(myBlock, Util.populateApiMap().get("getblockhash"));
+			blockRAW = (JsonObject) Util.getJSON(Util.populateApiMap().get("getblock") + blockHash);
+			blocco = Util.parseBlock(blockRAW);
+			blocco.dumpToFile(NDC_LOG);
+			blockchain.add(blocco);
+			logger.debug(blocco.toString());
+			myBlock++;
+		}
+	}
+
 	/**
 	 * This method download the portion of chain between the 2 input parameters
 	 * 
@@ -62,95 +115,34 @@ public class NeedleCoin {
 		JsonObject blockRAW;
 		Block blocco;
 		List<Block> blockChainPiece = new ArrayList<Block>();
-		//logger.info("*** STARTED SYNC CHAIN *** \n");
+		// logger.info("*** STARTED SYNC CHAIN *** \n");
 
-		//logger.info("Initializing sync:\n Going to download from " + blockStart + " To -> " + blockStop);
+		// logger.info("Initializing sync:\n Going to download from " + blockStart + "
+		// To -> " + blockStop);
 		while (blockStart < blockStop) {
-			//logger.debug("Fetching block " + blockStart + "\n");
+			// logger.debug("Fetching block " + blockStart + "\n");
 			blockHash = Util.getBlockHash(blockStart, Util.populateApiMap().get("getblockhash"));
 			blockRAW = (JsonObject) Util.getJSON(Util.populateApiMap().get("getblock") + blockHash);
 			blocco = Util.parseBlock(blockRAW);
 			blocco.dumpToFile(NDC_LOG);
 			// blockChainPiece.add(blocco);
-			//logger.debug(blocco.toString());
+			// logger.debug(blocco.toString());
 			blockStart++;
 		}
 		return blockChainPiece;
 	}
 
-	/**
-	 * This method download the complete chain from a given start number
-	 * 
-	 * @throws MalformedURLException
-	 */
-	public void syncChain() throws MalformedURLException {
-		String blockHash;
-		JsonObject blockRAW;
-		Block blocco;
-		//logger.info("*** STARTED SYNC CHAIN *** \n");
-
-		heightChain = Integer.valueOf((String) Util.getJSON(Util.populateApiMap().get("getblockcount")));
-		//logger.info("Initializing sync:\n Total block -> " + heightChain + "\n");
-		int myBlock = 1;
-		while (myBlock < heightChain) {
-			//logger.debug("Fetching block " + myBlock + "\n");
-			blockHash = Util.getBlockHash(myBlock, Util.populateApiMap().get("getblockhash"));
-			blockRAW = (JsonObject) Util.getJSON(Util.populateApiMap().get("getblock") + blockHash);
-			blocco = Util.parseBlock(blockRAW);
-			blocco.dumpToFile(NDC_LOG);
-			blockchain.add(blocco);
-			//logger.debug(blocco.toString());
-			myBlock++;
-		}
-	}
-
 	@Override
 	public String toString() {
 		String s = "\n******** DUMPING BLOCKCHAIN  START*******\n";
-		//logger.info(s);
+		logger.info(s);
 		StringBuilder sb = new StringBuilder();
 		for (Block block : blockchain) {
 			sb.append(block + "\n");
 		}
-		return "NeedleCoin [name=" + name + ", ticker=" + ticker + ", marketList=" + marketList + ", blockchain=" + sb
-				+ ", heightChain=" + heightChain + ", urlExplorer=" + urlExplorer + "]" + s;
+		return "NeedleCoin [name=" + name + ", ticker=" + ticker + ", blockchain=" + sb + ", heightChain=" + heightChain
+				+ ", urlExplorer=" + urlExplorer + "]" + s;
 
-	}
-
-	public void addBlockchainPiece(List<Block> blockchainPiece) {
-		this.blockchain.addAll(blockchainPiece);
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getTicker() {
-		return ticker;
-	}
-
-	public void setTicker(String ticker) {
-		this.ticker = ticker;
-	}
-
-	public List<String> getMarketList() {
-		return marketList;
-	}
-
-	public void setMarketList(List<String> marketList) {
-		this.marketList = marketList;
-	}
-
-	public List<Block> getBlockchain() {
-		return blockchain;
-	}
-
-	public void setBlockchain(List<Block> blockchain) {
-		this.blockchain.addAll(blockchain);
 	}
 
 }

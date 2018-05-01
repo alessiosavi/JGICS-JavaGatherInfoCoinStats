@@ -1,12 +1,17 @@
 package Blocco;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.JsonElement;
 
-public class ScriptPubKey {
+public class ScriptPubKey implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4666347330506514740L;
 	public String asm;
 	public String hex;
 	public int rqSigs;

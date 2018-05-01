@@ -1,8 +1,13 @@
 package util;
 
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,10 +28,15 @@ import Blocco.ScriptPubKey;
 import Blocco.Tx;
 import Blocco.Vin;
 import Blocco.Vout;
+import coin.SyncChain;
 
 public class Util {
 	public static String transaction = "http://79.20.51.52:28017/api/getrawtransaction?txid=&decrypt=1";
-	private static Map<String, String> apiCommands = new HashMap<String, String>(); // contains the api command
+	public static Map<String, String> apiCommands = new HashMap<String, String>(); // contains the api command
+
+	public static Logger logger = LogManager.getLogger(Util.class);
+
+	public String tx2 = "48621f85969b053f04e572977d57f4944244cb2247694d0b2566a3fe2b162945";
 
 	/**
 	 * This method return the block hash as a String
@@ -260,7 +270,34 @@ public class Util {
 		return apiCommands;
 	}
 
-	public Logger logger = LogManager.getLogger(Util.class);
+	public static void dumpSyncChain(String path, Object obj) throws IOException {
+		FileOutputStream fw = new FileOutputStream(path + "/" + Constants.NDC_SYNCHAIN_DUMP, true);
+		ObjectOutputStream ow = new ObjectOutputStream(fw);
+		ow.writeObject(obj);
+		ow.flush();
+		ow.close();
+		fw.flush();
+		fw.close();
+	}
 
-	public String tx2 = "48621f85969b053f04e572977d57f4944244cb2247694d0b2566a3fe2b162945";
+	/*
+	 * This method return the blockchain read from file
+	 */
+	public static void readSyncChain(String path) throws IOException, ClassNotFoundException {
+		FileInputStream fw = new FileInputStream(path + "/" + Constants.NDC_SYNCHAIN_DUMP);
+		ObjectInputStream oi = null;
+		try {
+			while (true) {
+
+				oi = new ObjectInputStream(fw);
+				Object object = oi.readObject();
+				logger.trace(object + "\n");
+			}
+		} catch (EOFException e) {
+			logger.error("END OF FILE REACHED\n");
+			oi.close();
+
+		}
+
+	}
 }

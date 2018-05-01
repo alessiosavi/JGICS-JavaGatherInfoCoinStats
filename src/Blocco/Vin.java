@@ -1,9 +1,15 @@
 package Blocco;
 
+import java.io.Serializable;
+
 import com.google.gson.JsonElement;
 
-public class Vin {
+public class Vin implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2601612925330344291L;
 	public String coinbase;
 	public double sequence;
 

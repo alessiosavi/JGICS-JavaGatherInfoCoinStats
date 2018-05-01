@@ -1,11 +1,16 @@
 package Blocco;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.google.gson.JsonElement;
 
-public class Tx {
+public class Tx implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 826615976123040287L;
 	public String hex;
 	public String txId;
 	public String version;

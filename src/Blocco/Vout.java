@@ -1,8 +1,15 @@
 package Blocco;
 
+import java.io.Serializable;
+
 import com.google.gson.JsonElement;
 
-public class Vout {
+public class Vout implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 124124493252327744L;
 
 	float value;
 

@@ -1,4 +1,4 @@
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -6,30 +6,33 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import coin.SyncChain;
+import util.Util;
 
 public class Main {
 	public static Logger logger = LogManager.getLogger(Main.class);
 	static List<SyncChain> syncChain;
 
 	public static String PATH_LOG_FILE;
-	public static int nThread = 10;
+	public static int nThread = 20;
 
-	public static int nBlocchi = 55;
+	public static int nBlocchi = 50;
 
 	/**
 	 * Take as first argument the path where dump data
 	 * 
 	 * @param args
 	 * @throws NumberFormatException
-	 * @throws MalformedURLException
 	 * @throws InterruptedException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
 	 */
-	public static void main(String[] args) throws NumberFormatException, MalformedURLException, InterruptedException {
+	public static void main(String[] args)
+			throws NumberFormatException, InterruptedException, IOException, ClassNotFoundException {
 
 		PATH_LOG_FILE = getPath(args);
 		syncChain = new ArrayList<SyncChain>();
 
-		iterationDispatcher(1, nBlocchi, 0);
+		iterationDispatcher(5, nBlocchi, 0);
 
 	}
 
@@ -73,7 +76,7 @@ public class Main {
 	 * 
 	 */
 	public static int iterationDispatcher(int nBlocchiXthread, int nBlocchi, int moreBlocks)
-			throws InterruptedException {
+			throws InterruptedException, IOException, ClassNotFoundException {
 		// this var will be the block that contains the number of block that every
 		// thread have to download at every iteratio.
 		int start, stop = 1;
@@ -112,25 +115,30 @@ public class Main {
 
 		}
 
-		for (SyncChain thread : syncChain)
+		for (SyncChain thread : syncChain) {
 			thread.join();
+		}
 
 		logger.info("TOTAL ADDITIONAL BLOCK -> " + additionalBlock + "\n");
-
 		if (additionalBlock > nThread) {
 			nBlocchiXthread = additionalBlock / (nThread + nBlocchiXthread);
 			iterationDispatcher(nBlocchiXthread, nBlocchi, nBlocchi - (nBlocchi - additionalBlock));
 		} else {
-
 			System.err.println("START FROM -> " + (nBlocchi - additionalBlock + 1) + " TO -> " + nBlocchi);
-
 			for (int i = nBlocchi - additionalBlock + 1; i <= nBlocchi; i++) {
 				logger.info("ADDITIONAL BLOCK -> " + i + "\n");
 			}
-
 			syncChain.add(new SyncChain(nBlocchi - additionalBlock + 1, nBlocchi, PATH_LOG_FILE));
 			syncChain.get(syncChain.size() - 1).start();
 		}
+
+		for (SyncChain thread : syncChain) {
+			thread.join();
+			System.err.println("DUMPING CHAIN");
+			Util.dumpSyncChain(PATH_LOG_FILE, thread);
+		}
+		Util.readSyncChain(PATH_LOG_FILE);
+
 
 		return 1;
 	}
@@ -145,5 +153,9 @@ public class Main {
 			logger.error("Working Directory = \"" + pathDumpChain + "\"\n");
 		}
 		return pathDumpChain;
+	}
+
+	public static void readObj() {
+
 	}
 }

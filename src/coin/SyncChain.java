@@ -1,6 +1,7 @@
 package coin;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,12 @@ import com.google.gson.JsonObject;
 import Blocco.Block;
 import util.Util;
 
-public class SyncChain extends Thread {
+public class SyncChain extends Thread implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static Logger logger = LogManager.getLogger(SyncChain.class);
 
 	/**
@@ -56,7 +62,7 @@ public class SyncChain extends Thread {
 	public void run() {
 		try {
 			blockchainPiece = syncChain(this.blockStart, this.blockStop);
-		} catch (MalformedURLException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
@@ -79,9 +85,9 @@ public class SyncChain extends Thread {
 	 * 
 	 * @param blockStart
 	 * @param blockStop
-	 * @throws MalformedURLException
+	 * @throws IOException
 	 */
-	public List<Block> syncChain(int blockStart, int blockStop) throws MalformedURLException {
+	public List<Block> syncChain(int blockStart, int blockStop) throws IOException {
 		String blockHash;
 		JsonObject blockRAW;
 		Block blocco;
@@ -92,18 +98,28 @@ public class SyncChain extends Thread {
 			blocco.dumpToFile(pathLogFile);
 			blockchainPiece.add(blocco);
 			logger.debug(blocco.toString() + "\n");
+
 			blockStart++;
 		}
 		return blockchainPiece;
 	}
 
-	public List<Block> syncChainNeedleCoin(int blockStart, int blockStop) throws MalformedURLException {
+	public List<Block> syncChainNeedleCoin(int blockStart, int blockStop) throws IOException {
 		while (blockStart < blockStop) {
 			blockchainPiece = this.syncChain(blockStart, blockStop);
 			blockStart++;
 		}
 		return blockchainPiece;
 
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (Block block : blockchainPiece) {
+			sb.append(block.toString() + "\n");
+		}
+		return sb.toString() + "\n";
 	}
 
 }

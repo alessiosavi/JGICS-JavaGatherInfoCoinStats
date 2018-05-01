@@ -3,13 +3,19 @@ package Blocco;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.google.gson.JsonElement;
 
-public class Block {
+public class Block implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2521990011570220787L;
 
 	private String hash;
 	private int confirmations;
@@ -83,14 +89,13 @@ public class Block {
 	 * @param fileName
 	 */
 	public void dumpToFile(String path) {
-		String string = "*********************************************************\n" + "Block[" + height + "]->"
-				+ "[hash=" + hash + ", confirmations=" + confirmations + ", size=" + size + ", version=" + version
-				+ ", merkleroot=" + merkleroot + ", mint=" + mint + ", time=" + time + ", nonce=" + nonce + ", bits="
-				+ bits + ", difficulty=" + difficulty + ", blocktrust=" + blocktrust + ", chaintrust=" + chaintrust
-				+ ", previousBlockHash=" + previousBlockHash + ", nextBlockHash=" + nextBlockHash + ", flags=" + flags
-				+ ", proofhash=" + proofhash + ", entropyBit=" + entropyBit + ", modifier=" + modifier
-				+ ", modifierChecksum=" + modifierChecksum + ", tx=" + tx + ", signature=" + signature + "]\n"
-				+ "*********************************************************\n";
+		String string = "Block[" + height + "]->" + "[hash=" + hash + ", confirmations=" + confirmations + ", size="
+				+ size + ", version=" + version + ", merkleroot=" + merkleroot + ", mint=" + mint + ", time=" + time
+				+ ", nonce=" + nonce + ", bits=" + bits + ", difficulty=" + difficulty + ", blocktrust=" + blocktrust
+				+ ", chaintrust=" + chaintrust + ", previousBlockHash=" + previousBlockHash + ", nextBlockHash="
+				+ nextBlockHash + ", flags=" + flags + ", proofhash=" + proofhash + ", entropyBit=" + entropyBit
+				+ ", modifier=" + modifier + ", modifierChecksum=" + modifierChecksum + ", tx=" + tx + ", signature="
+				+ signature + "]\n";
 
 		try (FileWriter fw = new FileWriter(path, true);
 				BufferedWriter bw = new BufferedWriter(fw);
@@ -281,14 +286,13 @@ public class Block {
 
 	@Override
 	public String toString() {
-		return "*********************************************************\n" + "Block[" + height + "]->" + "[hash="
-				+ hash + ", confirmations=" + confirmations + ", size=" + size + ", version=" + version
-				+ ", merkleroot=" + merkleroot + ", mint=" + mint + ", time=" + time + ", nonce=" + nonce + ", bits="
-				+ bits + ", difficulty=" + difficulty + ", blocktrust=" + blocktrust + ", chaintrust=" + chaintrust
-				+ ", previousBlockHash=" + previousBlockHash + ", nextBlockHash=" + nextBlockHash + ", flags=" + flags
-				+ ", proofhash=" + proofhash + ", entropyBit=" + entropyBit + ", modifier=" + modifier
-				+ ", modifierChecksum=" + modifierChecksum + ", tx=" + tx + ", signature=" + signature + "]\n"
-				+ "*********************************************************\n";
+		return "Block[" + height + "]->" + "[hash=" + hash + ", confirmations=" + confirmations + ", size=" + size
+				+ ", version=" + version + ", merkleroot=" + merkleroot + ", mint=" + mint + ", time=" + time
+				+ ", nonce=" + nonce + ", bits=" + bits + ", difficulty=" + difficulty + ", blocktrust=" + blocktrust
+				+ ", chaintrust=" + chaintrust + ", previousBlockHash=" + previousBlockHash + ", nextBlockHash="
+				+ nextBlockHash + ", flags=" + flags + ", proofhash=" + proofhash + ", entropyBit=" + entropyBit
+				+ ", modifier=" + modifier + ", modifierChecksum=" + modifierChecksum + ", tx=" + tx + ", signature="
+				+ signature + "]\n";
 	}
 
 }

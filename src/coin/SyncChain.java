@@ -13,7 +13,7 @@ import Blocco.Block;
 import util.Util;
 
 public class SyncChain extends Thread {
-	public static Logger logger = LogManager.getLogger(NeedleCoin.class);
+	public static Logger logger = LogManager.getLogger(SyncChain.class);
 
 	/**
 	 * This method return the piece of blockchin between the 2 start number
@@ -22,7 +22,9 @@ public class SyncChain extends Thread {
 	 * @param blockStop
 	 * @return
 	 */
+	String LOG_FILE_NAME = "ndcDump";
 
+	String pathLogFile = "";
 	int blockStart, blockStop;
 	List<Block> blockchainPiece = new ArrayList<Block>();
 
@@ -32,9 +34,10 @@ public class SyncChain extends Thread {
 	 * @param blockStart
 	 * @param blockStop
 	 */
-	public SyncChain(int blockStart, int blockStop) {
+	public SyncChain(int blockStart, int blockStop, String pathLogFile) {
 		this.blockStart = blockStart;
 		this.blockStop = blockStop;
+		this.pathLogFile = Util.parsePath(pathLogFile);
 	}
 
 	public List<Block> getBlockchainPiece() {
@@ -85,7 +88,7 @@ public class SyncChain extends Thread {
 			blockHash = Util.getBlockHash(blockStart, Util.populateApiMap().get("getblockhash"));
 			blockRAW = (JsonObject) Util.getJSON(Util.populateApiMap().get("getblock") + blockHash);
 			blocco = Util.parseBlock(blockRAW);
-			blocco.dumpToFile("ndcDump");
+			blocco.dumpToFile(pathLogFile);
 			blockchainPiece.add(blocco);
 			logger.debug(blocco.toString() + "\n");
 			blockStart++;

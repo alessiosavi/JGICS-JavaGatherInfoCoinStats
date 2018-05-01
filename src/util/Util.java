@@ -222,8 +222,6 @@ public class Util {
 		// logger.debug(tx + "\n");
 		return tx;
 	}
-	
-
 
 	/**
 	 * Populate the map with the url of every Explorer methods getRAWtransaction &&
@@ -248,4 +246,20 @@ public class Util {
 		return apiCommands;
 	}
 
+	/**
+	 * This method take care of initializate the path with correct string format
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static String parsePath(String path) {
+		String pathLogFile;
+		String LOG_FILE_NAME = "ndcDump";
+		if (path.lastIndexOf("/") < path.length() - 1) {
+			pathLogFile = path + "/" + LOG_FILE_NAME;
+		} else {
+			pathLogFile = path + LOG_FILE_NAME;
+		}
+		return pathLogFile;
+	}
 }

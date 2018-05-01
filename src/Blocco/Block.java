@@ -82,7 +82,7 @@ public class Block {
 	 * 
 	 * @param fileName
 	 */
-	public void dumpToFile(String fileName) {
+	public void dumpToFile(String path) {
 		String string = "*********************************************************\n" + "Block[" + height + "]->"
 				+ "[hash=" + hash + ", confirmations=" + confirmations + ", size=" + size + ", version=" + version
 				+ ", merkleroot=" + merkleroot + ", mint=" + mint + ", time=" + time + ", nonce=" + nonce + ", bits="
@@ -92,15 +92,14 @@ public class Block {
 				+ ", modifierChecksum=" + modifierChecksum + ", tx=" + tx + ", signature=" + signature + "]\n"
 				+ "*********************************************************\n";
 
-		try (FileWriter fw = new FileWriter(fileName, true);
+		try (FileWriter fw = new FileWriter(path, true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
 			out.println(string);
 
 		} catch (Exception e) {
-			System.out.println(e.getStackTrace());
-			System.out.println(e.getMessage());
-
+			System.err.println(e.getStackTrace());
+			System.err.println(e.getMessage());
 		}
 	}
 

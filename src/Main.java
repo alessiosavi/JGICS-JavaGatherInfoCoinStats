@@ -11,6 +11,7 @@ public class Main {
 	public static Logger logger = LogManager.getLogger(Main.class);
 	static List<SyncChain> syncChain;
 
+	public static String PATH_LOG_FILE;
 	public static int nThread = 2;
 
 	public static int nBlocchi = 28;
@@ -24,19 +25,11 @@ public class Main {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws NumberFormatException, MalformedURLException, InterruptedException {
-		// nBlocchi = Integer.valueOf((String)
-		// Util.getJSON(Util.populateApiMap().get("getblockcount")));
 
+		PATH_LOG_FILE = getPath(args);
 		syncChain = new ArrayList<SyncChain>();
 
 		iterationDispatcher(5);
-
-		/*
-		 * populateSyncChainList(nThread, nBlocchiXthread);
-		 * logger.info("*** SyncChain Size -> " + syncChain.size() + "*** \n");
-		 * 
-		 * for (SyncChain s : syncChain) { s.start(); }
-		 */
 
 	}
 
@@ -50,7 +43,7 @@ public class Main {
 		for (int i = 0; i < nThread; i++) {
 			int start = i * nBlocchiXthread + 1;
 			int stop = (i + 1) * nBlocchiXthread;
-			syncChain.add(new SyncChain(start, stop));
+			syncChain.add(new SyncChain(start, stop, PATH_LOG_FILE));
 		}
 	}
 
@@ -94,17 +87,18 @@ public class Main {
 		logger.info("TOTAL NUMBER OF Additional Block -> " + additionalBlock + "\n");
 		int start = 0, stop = 1;
 		for (int i = 0; i < totalIteration; i++) {
-			logger.info("ITERATION " + (i + 1) + ") From Block -> " + (i * nBlocchiXthread * nThread + 1)
-					+ " To Block -> " + ((i + 1) * nBlocchiXthread * nThread + 1) + "\n");
+			logger.info("ITERATION " + (i + 1) + ") From Block -> " + (i * nBlocchiXthread * nThread) + " To Block -> "
+					+ ((i + 1) * nBlocchiXthread * nThread) + "\n");
 			for (int j = 0; j < nThread; j++) {
 				start = stop;
-				stop = start + nBlocchiXthread;
+				stop = start + nBlocchiXthread - 1;
 
 				System.err.println("START -> " + start);
 				System.err.println("STOP -> " + stop);
-				
+				stop++;
+
 				// Create blockchain thread
-				syncChain.add(new SyncChain(start, stop)); // Create a new Thread Object
+				syncChain.add(new SyncChain(start, stop, PATH_LOG_FILE)); // Create a new Thread Object
 				syncChain.get(syncChain.size() - 1).start(); // Start the last thread created
 			}
 
@@ -116,9 +110,21 @@ public class Main {
 		for (int i = nBlocchi - additionalBlock; i < nBlocchi; i++) {
 			logger.info("ADDITIONAL BLOCK -> " + i + "\n");
 		}
-		syncChain.add(new SyncChain(nBlocchi - additionalBlock, nBlocchi));
+		syncChain.add(new SyncChain(nBlocchi - additionalBlock, nBlocchi, PATH_LOG_FILE));
 		syncChain.get(syncChain.size() - 1).start();
 
 		return 1;
+	}
+
+	public static String getPath(String[] args) {
+		String pathDumpChain;
+		if (args != null && args.length > 0) {
+			pathDumpChain = args[0].trim();
+		} else {
+			pathDumpChain = System.getProperty("user.dir").trim();
+			logger.error("NO PARAMETER PROVIDED!! USING WORKING DIR AS DEFAULT LOG_DIR \n");
+			logger.error("Working Directory = \"" + pathDumpChain + "\"\n");
+		}
+		return pathDumpChain;
 	}
 }

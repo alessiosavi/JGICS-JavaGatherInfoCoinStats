@@ -52,6 +52,7 @@ public class SyncChain extends Thread {
 		return blockStop;
 	}
 
+	@Override
 	public void run() {
 		try {
 			blockchainPiece = syncChain(this.blockStart, this.blockStop);

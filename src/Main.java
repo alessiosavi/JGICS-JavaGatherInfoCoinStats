@@ -12,9 +12,9 @@ public class Main {
 	static List<SyncChain> syncChain;
 
 	public static String PATH_LOG_FILE;
-	public static int nThread = 2;
+	public static int nThread = 10;
 
-	public static int nBlocchi = 28;
+	public static int nBlocchi = 55;
 
 	/**
 	 * Take as first argument the path where dump data
@@ -29,7 +29,7 @@ public class Main {
 		PATH_LOG_FILE = getPath(args);
 		syncChain = new ArrayList<SyncChain>();
 
-		iterationDispatcher(5);
+		iterationDispatcher(1, nBlocchi, 0);
 
 	}
 
@@ -72,9 +72,16 @@ public class Main {
 	 * 
 	 * 
 	 */
-	public static int iterationDispatcher(int nBlocchiXthread) throws InterruptedException {
+	public static int iterationDispatcher(int nBlocchiXthread, int nBlocchi, int moreBlocks)
+			throws InterruptedException {
 		// this var will be the block that contains the number of block that every
-		// thread have to download at every iteration.
+		// thread have to download at every iteratio.
+		int start, stop = 1;
+
+		if (moreBlocks != 0) {
+			stop = moreBlocks;
+
+		}
 
 		int totalIteration = nBlocchi / (nBlocchiXthread * nThread);
 		logger.info("TOTAL NUMBER OF ITERATION -> " + totalIteration + "\n");
@@ -85,11 +92,12 @@ public class Main {
 		// have to be downloaded in a separate cycle.
 		int additionalBlock = nBlocchi - (nBlocchiXthread * nThread * totalIteration);
 		logger.info("TOTAL NUMBER OF Additional Block -> " + additionalBlock + "\n");
-		int start = 0, stop = 1;
+
 		for (int i = 0; i < totalIteration; i++) {
 			logger.info("ITERATION " + (i + 1) + ") From Block -> " + (i * nBlocchiXthread * nThread) + " To Block -> "
 					+ ((i + 1) * nBlocchiXthread * nThread) + "\n");
 			for (int j = 0; j < nThread; j++) {
+				logger.info("THREAD -> " + j);
 				start = stop;
 				stop = start + nBlocchiXthread - 1;
 
@@ -104,14 +112,25 @@ public class Main {
 
 		}
 
-		// Additional block can be only <= nBlocchiXthread
-		logger.info("ADDITIONAL BLOCK -> " + additionalBlock + "\n");
+		for (SyncChain thread : syncChain)
+			thread.join();
 
-		for (int i = nBlocchi - additionalBlock; i < nBlocchi; i++) {
-			logger.info("ADDITIONAL BLOCK -> " + i + "\n");
+		logger.info("TOTAL ADDITIONAL BLOCK -> " + additionalBlock + "\n");
+
+		if (additionalBlock > nThread) {
+			nBlocchiXthread = additionalBlock / (nThread + nBlocchiXthread);
+			iterationDispatcher(nBlocchiXthread, nBlocchi, nBlocchi - (nBlocchi - additionalBlock));
+		} else {
+
+			System.err.println("START FROM -> " + (nBlocchi - additionalBlock + 1) + " TO -> " + nBlocchi);
+
+			for (int i = nBlocchi - additionalBlock + 1; i <= nBlocchi; i++) {
+				logger.info("ADDITIONAL BLOCK -> " + i + "\n");
+			}
+
+			syncChain.add(new SyncChain(nBlocchi - additionalBlock + 1, nBlocchi, PATH_LOG_FILE));
+			syncChain.get(syncChain.size() - 1).start();
 		}
-		syncChain.add(new SyncChain(nBlocchi - additionalBlock, nBlocchi, PATH_LOG_FILE));
-		syncChain.get(syncChain.size() - 1).start();
 
 		return 1;
 	}

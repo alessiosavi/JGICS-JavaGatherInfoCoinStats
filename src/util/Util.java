@@ -26,10 +26,7 @@ import Blocco.Vout;
 
 public class Util {
 	public static String transaction = "http://79.20.51.52:28017/api/getrawtransaction?txid=&decrypt=1";
-	public Logger logger = LogManager.getLogger(Util.class);
 	private static Map<String, String> apiCommands = new HashMap<String, String>(); // contains the api command
-
-	public String tx2 = "48621f85969b053f04e572977d57f4944244cb2247694d0b2566a3fe2b162945";
 
 	/**
 	 * This method return the block hash as a String
@@ -105,6 +102,23 @@ public class Util {
 		}
 		// logger.info("BLOCK NUMBER --> " + blocco.getHeight() + "\n");
 		return blocco;
+	}
+
+	/**
+	 * This method take care of initializate the path with correct string format
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static String parsePath(String path) {
+		String pathLogFile;
+		String LOG_FILE_NAME = "ndcDump";
+		if (path.lastIndexOf("/") < path.length() - 1) {
+			pathLogFile = path + "/" + LOG_FILE_NAME;
+		} else {
+			pathLogFile = path + LOG_FILE_NAME;
+		}
+		return pathLogFile;
 	}
 
 	/*
@@ -246,20 +260,7 @@ public class Util {
 		return apiCommands;
 	}
 
-	/**
-	 * This method take care of initializate the path with correct string format
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public static String parsePath(String path) {
-		String pathLogFile;
-		String LOG_FILE_NAME = "ndcDump";
-		if (path.lastIndexOf("/") < path.length() - 1) {
-			pathLogFile = path + "/" + LOG_FILE_NAME;
-		} else {
-			pathLogFile = path + LOG_FILE_NAME;
-		}
-		return pathLogFile;
-	}
+	public Logger logger = LogManager.getLogger(Util.class);
+
+	public String tx2 = "48621f85969b053f04e572977d57f4944244cb2247694d0b2566a3fe2b162945";
 }

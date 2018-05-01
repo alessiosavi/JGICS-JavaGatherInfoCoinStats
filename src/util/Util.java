@@ -222,6 +222,8 @@ public class Util {
 		// logger.debug(tx + "\n");
 		return tx;
 	}
+	
+
 
 	/**
 	 * Populate the map with the url of every Explorer methods getRAWtransaction &&

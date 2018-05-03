@@ -81,7 +81,12 @@ public class SyncChain extends Thread implements Serializable {
 	}
 
 	/**
-	 * This method download the portion of chain between the 2 input parameters
+	 * This method download the portion of chain between the 2 input parameters. It
+	 * take 2 integer as input for delimit the bounds of the blockchain's block to
+	 * download (from which block start and from which block stop).
+	 * 
+	 * It use the blockStart (the height of that block) for get the "BlockHash"
+	 * (getBlockHash). Then try to fetch the JsonObject block and add to the chain.
 	 * 
 	 * @param blockStart
 	 * @param blockStop
@@ -95,22 +100,11 @@ public class SyncChain extends Thread implements Serializable {
 			blockHash = Util.getBlockHash(blockStart, Util.populateApiMap().get("getblockhash"));
 			blockRAW = (JsonObject) Util.getJSON(Util.populateApiMap().get("getblock") + blockHash);
 			blocco = Util.parseBlock(blockRAW);
-			blocco.dumpToFile(pathLogFile);
 			blockchainPiece.add(blocco);
-			logger.debug(blocco.toString() + "\n");
-
+			logger.info(blocco);
 			blockStart++;
 		}
 		return blockchainPiece;
-	}
-
-	public List<Block> syncChainNeedleCoin(int blockStart, int blockStop) throws IOException {
-		while (blockStart < blockStop) {
-			blockchainPiece = this.syncChain(blockStart, blockStop);
-			blockStart++;
-		}
-		return blockchainPiece;
-
 	}
 
 	@Override

@@ -1,11 +1,13 @@
 package Blocco;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.google.gson.JsonElement;
 
-public class Tx implements Serializable{
+public class Tx implements Serializable {
 
 	/**
 	 * 
@@ -16,8 +18,8 @@ public class Tx implements Serializable{
 	public String version;
 	public Date time;
 	public int locktime;
-	public Vin vinList;
-	public Vout voutList;
+	public List<Vin> vinList = new ArrayList<Vin>();
+	public List<Vout> voutList = new ArrayList<Vout>();
 	public String blockhash;
 	public int confirmations;
 	public Date blocktime;
@@ -45,6 +47,19 @@ public class Tx implements Serializable{
 		this.blockhash = blockhash.getAsString();
 		this.confirmations = confirmations.getAsInt();
 		this.blocktime = new Date(Long.valueOf(blocktime));
+	}
+
+	public Tx() {
+		this.hex = this.txId = "";
+		this.version = "";
+		this.time = new Date();
+		this.locktime = -1;
+		this.vinList = new ArrayList<Vin>();
+		this.voutList = new ArrayList<Vout>();
+		this.blockhash = "";
+		this.confirmations = -1;
+		this.blocktime = new Date();
+
 	}
 
 	public String getBlockhash() {
@@ -79,14 +94,6 @@ public class Tx implements Serializable{
 		return version;
 	}
 
-	public Vin getVinList() {
-		return vinList;
-	}
-
-	public Vout getVoutList() {
-		return voutList;
-	}
-
 	public void setBlockhash(String blockhash) {
 		this.blockhash = blockhash;
 	}
@@ -119,12 +126,32 @@ public class Tx implements Serializable{
 		this.version = version;
 	}
 
-	public void setVinList(Vin vinList) {
+	public List<Vin> getVinList() {
+		return vinList;
+	}
+
+	public void setVinList(List<Vin> vinList) {
 		this.vinList = vinList;
 	}
 
-	public void setVoutList(Vout voutList) {
+	public List<Vout> getVoutList() {
+		return voutList;
+	}
+
+	public void setVoutList(List<Vout> voutList) {
 		this.voutList = voutList;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public void addVin(Vin vin) {
+		this.vinList.add(vin);
+	}
+
+	public void addVout(Vout vout) {
+		this.voutList.add(vout);
 	}
 
 	@Override

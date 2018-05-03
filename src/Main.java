@@ -15,7 +15,7 @@ public class Main {
 	public static String PATH_LOG_FILE;
 	public static int nThread = 20;
 
-	public static int nBlocchi = 50;
+	public static int nBlocchi;
 
 	/**
 	 * Take as first argument the path where dump data
@@ -29,10 +29,13 @@ public class Main {
 	public static void main(String[] args)
 			throws NumberFormatException, InterruptedException, IOException, ClassNotFoundException {
 
+		int heightChain = Integer.valueOf((String) Util.getJSON(Util.populateApiMap().get("getblockcount")));
+		logger.info("Initializing sync:\n Total block -> " + heightChain + "\n");
+		nBlocchi = heightChain;
 		PATH_LOG_FILE = getPath(args);
-		syncChain = new ArrayList<SyncChain>();
+		// util.Test.test();
 
-		iterationDispatcher(5, nBlocchi, 0);
+		iterationDispatcher(200, nBlocchi, 0);
 
 	}
 
@@ -79,6 +82,7 @@ public class Main {
 			throws InterruptedException, IOException, ClassNotFoundException {
 		// this var will be the block that contains the number of block that every
 		// thread have to download at every iteratio.
+
 		int start, stop = 1;
 
 		if (moreBlocks != 0) {
@@ -97,6 +101,8 @@ public class Main {
 		logger.info("TOTAL NUMBER OF Additional Block -> " + additionalBlock + "\n");
 
 		for (int i = 0; i < totalIteration; i++) {
+			syncChain = new ArrayList<SyncChain>();
+
 			logger.info("ITERATION " + (i + 1) + ") From Block -> " + (i * nBlocchiXthread * nThread) + " To Block -> "
 					+ ((i + 1) * nBlocchiXthread * nThread) + "\n");
 			for (int j = 0; j < nThread; j++) {
@@ -112,11 +118,12 @@ public class Main {
 				syncChain.add(new SyncChain(start, stop, PATH_LOG_FILE)); // Create a new Thread Object
 				syncChain.get(syncChain.size() - 1).start(); // Start the last thread created
 			}
+			for (SyncChain thread : syncChain) {
+				thread.join();
+				System.err.println("DUMPING CHAIN");
+				Util.dumpSyncChain(PATH_LOG_FILE, thread);
+			}
 
-		}
-
-		for (SyncChain thread : syncChain) {
-			thread.join();
 		}
 
 		logger.info("TOTAL ADDITIONAL BLOCK -> " + additionalBlock + "\n");
@@ -124,6 +131,8 @@ public class Main {
 			nBlocchiXthread = additionalBlock / (nThread + nBlocchiXthread);
 			iterationDispatcher(nBlocchiXthread, nBlocchi, nBlocchi - (nBlocchi - additionalBlock));
 		} else {
+			syncChain = new ArrayList<SyncChain>();
+
 			System.err.println("START FROM -> " + (nBlocchi - additionalBlock + 1) + " TO -> " + nBlocchi);
 			for (int i = nBlocchi - additionalBlock + 1; i <= nBlocchi; i++) {
 				logger.info("ADDITIONAL BLOCK -> " + i + "\n");
@@ -136,9 +145,10 @@ public class Main {
 			thread.join();
 			System.err.println("DUMPING CHAIN");
 			Util.dumpSyncChain(PATH_LOG_FILE, thread);
-		}
-		Util.readSyncChain(PATH_LOG_FILE);
 
+		}
+		System.out.println("NOW READING FILE");
+		Util.readSyncChain(PATH_LOG_FILE);
 
 		return 1;
 	}

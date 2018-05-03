@@ -6,27 +6,40 @@ import java.util.List;
 
 import com.google.gson.JsonElement;
 
-public class ScriptPubKey implements Serializable{
+public class ScriptPubKey implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4666347330506514740L;
-	public String asm;
-	public String hex;
-	public int rqSigs;
-	public String type; // pubkey,pubkeyhash,nontstandard
-	public List<String> addresses;
+	public String asm = "";
+	public String hex = "";
+	public int reqSigs = -1;
+	public String type = ""; // pubkey,pubkeyhash,nontstandard
+	public List<String> addresses = new ArrayList<String>();
+
+	// public ScriptPubKey() {
+	// this.asm = "";
+	// this.hex = "";
+	// this.reqSigs = -1;
+	// this.type = "";
+	// this.addresses = new ArrayList<String>();
+	// }
 
 	public ScriptPubKey() {
+
 	}
 
-	public ScriptPubKey(JsonElement asm, JsonElement hex, JsonElement type) {
+	public ScriptPubKey(JsonElement asm, JsonElement hex, JsonElement reqSigs, JsonElement type) {
 		super();
-		this.asm = asm.toString();
-		this.hex = hex.toString();
-		this.type = type.toString();
-		this.addresses = new ArrayList<String>();
+		if (asm != null)
+			this.asm = asm.toString();
+		if (hex != null)
+			this.hex = hex.toString();
+		if (reqSigs != null)
+			this.reqSigs = Integer.valueOf(reqSigs.toString());
+		if (type != null)
+			this.type = type.toString();
 	}
 
 	public List<String> getAddresses() {
@@ -42,7 +55,7 @@ public class ScriptPubKey implements Serializable{
 	}
 
 	public int getRqSigs() {
-		return rqSigs;
+		return reqSigs;
 	}
 
 	public String getType() {
@@ -62,7 +75,7 @@ public class ScriptPubKey implements Serializable{
 	}
 
 	public void setRqSigs(int rqSigs) {
-		this.rqSigs = rqSigs;
+		this.reqSigs = rqSigs;
 	}
 
 	public void setType(String type) {
@@ -71,7 +84,7 @@ public class ScriptPubKey implements Serializable{
 
 	@Override
 	public String toString() {
-		return "ScriptPubKey [asm=" + asm + ", hex=" + hex + ", rqSigs=" + rqSigs + ", type=" + type + ", addresses="
+		return "ScriptPubKey [asm=" + asm + ", hex=" + hex + ", rqSigs=" + reqSigs + ", type=" + type + ", addresses="
 				+ addresses + "]";
 	}
 

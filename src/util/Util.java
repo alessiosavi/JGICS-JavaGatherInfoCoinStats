@@ -1,3 +1,4 @@
+
 package util;
 
 import java.io.EOFException;
@@ -25,10 +26,10 @@ import com.google.gson.JsonParser;
 
 import Blocco.Block;
 import Blocco.ScriptPubKey;
+import Blocco.ScriptSig;
 import Blocco.Tx;
 import Blocco.Vin;
 import Blocco.Vout;
-import coin.SyncChain;
 
 public class Util {
 	public static String transaction = "http://79.20.51.52:28017/api/getrawtransaction?txid=&decrypt=1";
@@ -39,7 +40,11 @@ public class Util {
 	public String tx2 = "48621f85969b053f04e572977d57f4944244cb2247694d0b2566a3fe2b162945";
 
 	/**
-	 * This method return the block hash as a String
+	 * This method return the block from a given height number. It use the getJSON
+	 * method for fetch the number of the block.
+	 * 
+	 * This method is used for fetch a specified block hash from the height of the
+	 * block
 	 * 
 	 * @param height
 	 * @param url
@@ -51,12 +56,15 @@ public class Util {
 		return blockhash;
 	}
 
+	// @formatter:off
+
 	/**
-	 * This method feth a json from a given url and return the contenet in a String
-	 * format
 	 * 
-	 * It return an "Object" datatype, because the response can be a string or a
-	 * JsonObject
+	 * This method return an Object (String or JsonObject) fetched from the URL
+	 * passed as a parameter. It is used for fetch block & heigh of a block.
+	 * 
+	 * This method return a "non-specified" Object. In reality can be: 1) JsonObject
+	 * 2) String
 	 * 
 	 * @param URL
 	 * @return
@@ -73,7 +81,7 @@ public class Util {
 			e.printStackTrace();
 		}
 		// Convert to a JSON object to print data
-		JsonParser jp = new JsonParser(); // from gson
+		JsonParser jp = new JsonParser();
 		JsonElement root = null;
 		try {
 			root = jp.parse(new InputStreamReader((InputStream) request.getContent()));
@@ -83,10 +91,11 @@ public class Util {
 		} // Convert the input stream to a json element
 		JsonObject oggetto;
 		String stringa;
+		// If is a JsonObject return the object
 		if (root.isJsonObject()) {
 			oggetto = root.getAsJsonObject();
 			return oggetto;
-		} else {
+		} else { // if is a simple String return the String
 			stringa = root.toString();
 			return stringa;
 		}
@@ -136,55 +145,61 @@ public class Util {
 	 */
 	public static Tx parseTx(String TX) throws MalformedURLException {
 
-		String[] link = new String[1]; // apiMethods splitted
-		String urlAPI;// composed by splitting apiMethods & concatenating with TX
+		String[] link = new String[1];
+		String urlAPI;
 		JsonObject jsonTx; // Tx in JsonObject format
 		Tx tx; // return object
-		Vin vin = new Vin();
-		Vout vout;
-		List<String> addressList = new ArrayList<String>();
-		ScriptPubKey scriptPubKey;
+
 		link = transaction.split("&");
 		urlAPI = link[0] + TX + "&" + link[1];
 		urlAPI = urlAPI.replace("\"", "");
-		jsonTx = (JsonObject) getJSON(urlAPI);
+		jsonTx = (JsonObject) Util.getJSON(urlAPI);
 
 		tx = new Tx(jsonTx.get("hex"), jsonTx.get("txid"), jsonTx.get("version"), jsonTx.get("time").toString(),
 				jsonTx.get("locktime"), jsonTx.get("blockhash"), jsonTx.get("confirmations"),
 				jsonTx.get("blocktime").toString());
-		if (jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject() != null) {
-			try {
-				vin = new Vin(jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("coinbase"),
-						jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("sequence"));
-			} catch (NullPointerException e) {
-				System.err.println();
+
+		/*************************** GET VIN DATA ***************************/
+
+		if (jsonTx.get("vin").getAsJsonArray() != null) {
+			for (JsonElement data : jsonTx.get("vin").getAsJsonArray()) {
+
+				Vin vin = new Vin(data.getAsJsonObject().get("txid"), data.getAsJsonObject().get("vout"),
+						data.getAsJsonObject().get("coinbase"), data.getAsJsonObject().get("sequence"));
+				if (data.getAsJsonObject().get("scriptSig") != null) {
+					JsonElement scriptSigJson = data.getAsJsonObject().get("scriptSig");
+					ScriptSig scriptSig = new ScriptSig(scriptSigJson.getAsJsonObject().get("asm"),
+							scriptSigJson.getAsJsonObject().get("hex"));
+					vin.setScriptSig(scriptSig);
+				}
+				tx.addVin(vin);
 			}
 		}
-		tx.setVinList(vin);
 
-		scriptPubKey = new ScriptPubKey(
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
-						.get("asm"),
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
-						.get("hex"),
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
-						.get("type"));
-		vout = new Vout(jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("value"),
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("n"), scriptPubKey);
+		/*************************** GET VOUT DATA ***************************/
+		if (jsonTx.get("vout").getAsJsonArray() != null)
 
-		if (jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
-				.get("addresses") != null) {
-			for (JsonElement string : jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey")
-					.getAsJsonObject().get("addresses").getAsJsonArray()) {
-				// logger.info("*** Address -> " + string.toString().replace("\"", "") + " ***
-				// \n");
-				addressList.add(string.toString().replace("\"", ""));
+		{
+			for (JsonElement data : jsonTx.get("vout").getAsJsonArray()) {
+				List<String> addressList = new ArrayList<String>();
+				Vout vout = new Vout(data.getAsJsonObject().get("value"), data.getAsJsonObject().get("n"));
+				JsonElement scriptPubKeyJson = data.getAsJsonObject().get("scriptPubKey");
+				ScriptPubKey scriptPubKey = new ScriptPubKey(scriptPubKeyJson.getAsJsonObject().get("asm"),
+						scriptPubKeyJson.getAsJsonObject().get("hex"),
+						scriptPubKeyJson.getAsJsonObject().get("reqSigs"),
+						scriptPubKeyJson.getAsJsonObject().get("type"));
+				for (JsonElement address : scriptPubKeyJson.getAsJsonObject().get("addresses").getAsJsonArray()) {
+					addressList.add(address.toString().replace("\"", ""));
+				}
+				scriptPubKey.setAddresses(addressList);
+				vout.setScriptPubKey(scriptPubKey);
+				tx.addVout(vout);
 			}
 		}
-		scriptPubKey.setAddresses(addressList);
-		tx.setVoutList(vout);
-		// logger.debug(tx + "\n");
+		// System.out.println("TX -> " + tx.toString());
+
 		return tx;
+
 	}
 
 	/**
@@ -196,60 +211,70 @@ public class Util {
 	 * @return
 	 * @throws MalformedURLException
 	 */
-	public static Tx parseTx(String apiMethods, String TX) throws MalformedURLException {
-		String[] link = new String[1]; // apiMethods splitted
-		String urlAPI;// composed by splitting apiMethods & concatenating with TX
-		JsonObject jsonTx; // Tx in JsonObject format
-		Tx tx; // return object
-		Vin vin = new Vin();
-		Vout vout;
-		List<String> addressList = new ArrayList<String>();
-		ScriptPubKey scriptPubKey;
-
-		link = apiMethods.split("&");
-		urlAPI = link[0] + TX + "&" + link[1];
-		jsonTx = (JsonObject) getJSON(urlAPI);
-
-		tx = new Tx(jsonTx.get("hex"), jsonTx.get("txid"), jsonTx.get("version"), jsonTx.get("time").toString(),
-				jsonTx.get("locktime"), jsonTx.get("blockhash"), jsonTx.get("confirmations"),
-				jsonTx.get("blocktime").toString());
-		if (jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject() != null) {
-			try {
-				vin = new Vin(jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("coinbase"),
-						jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("sequence"));
-			} catch (NullPointerException e) {
-			}
-		}
-		tx.setVinList(vin);
-
-		scriptPubKey = new ScriptPubKey(
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
-						.get("asm"),
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
-						.get("hex"),
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
-						.get("type"));
-		vout = new Vout(jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("value"),
-				jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("n"), scriptPubKey);
-
-		if (jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
-				.get("addresses") != null) {
-			for (JsonElement string : jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey")
-					.getAsJsonObject().get("addresses").getAsJsonArray()) {
-				// logger.info("*** Address -> " + string.toString().replace("\"", "") + " ***
-				// \n");
-				addressList.add(string.toString().replace("\"", ""));
-			}
-		}
-		scriptPubKey.setAddresses(addressList);
-		tx.setVoutList(vout);
-		// logger.debug(tx + "\n");
-		return tx;
-	}
+	// public static Tx parseTx(String apiMethods, String TX) throws
+	// MalformedURLException {
+	// String[] link = new String[1]; // apiMethods splitted
+	// String urlAPI;// composed by splitting apiMethods & concatenating with TX
+	// JsonObject jsonTx; // Tx in JsonObject format
+	// Tx tx; // return object
+	// Vin vin = new Vin();
+	// Vout vout;
+	// List<String> addressList = new ArrayList<String>();
+	// ScriptPubKey scriptPubKey;
+	//
+	// link = apiMethods.split("&");
+	// urlAPI = link[0] + TX + "&" + link[1];
+	// jsonTx = (JsonObject) getJSON(urlAPI);
+	//
+	// tx = new Tx(jsonTx.get("hex"), jsonTx.get("txid"), jsonTx.get("version"),
+	// jsonTx.get("time").toString(),
+	// jsonTx.get("locktime"), jsonTx.get("blockhash"), jsonTx.get("confirmations"),
+	// jsonTx.get("blocktime").toString());
+	// if (jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject() != null) {
+	// try {
+	// vin = new
+	// Vin(jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("coinbase"),
+	// jsonTx.get("vin").getAsJsonArray().get(0).getAsJsonObject().get("sequence"));
+	// } catch (NullPointerException e) {
+	// }
+	// }
+	// tx.setVinList(vin);
+	//
+	// scriptPubKey = new ScriptPubKey(
+	// jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
+	// .get("asm"),
+	// jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
+	// .get("hex"),
+	// jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
+	// .get("type"));
+	// vout = new
+	// Vout(jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("value"),
+	// jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("n"),
+	// scriptPubKey);
+	//
+	// if
+	// (jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey").getAsJsonObject()
+	// .get("addresses") != null) {
+	// for (JsonElement string :
+	// jsonTx.get("vout").getAsJsonArray().get(0).getAsJsonObject().get("scriptPubKey")
+	// .getAsJsonObject().get("addresses").getAsJsonArray()) {
+	// // logger.info("*** Address -> " + string.toString().replace("\"", "") + "
+	// ***
+	// // \n");
+	// addressList.add(string.toString().replace("\"", ""));
+	// }
+	// }
+	// scriptPubKey.setAddresses(addressList);
+	// tx.setVoutList(vout);
+	// // logger.debug(tx + "\n");
+	// return tx;
+	// }
 
 	/**
 	 * Populate the map with the url of every Explorer methods getRAWtransaction &&
 	 * gettransactions have to splitted by "&" character for insert the hash value
+	 * 
+	 * This metod contains every method for a specified "BlockChainExplorer" site
 	 */
 	public static Map<String, String> populateApiMap() {
 		String urlExplorer = "http://79.20.51.52:28017/";
@@ -270,6 +295,7 @@ public class Util {
 		return apiCommands;
 	}
 
+	// This method is used for dump a piece of blockchain (SyncChain object)
 	public static void dumpSyncChain(String path, Object obj) throws IOException {
 		FileOutputStream fw = new FileOutputStream(path + "/" + Constants.NDC_SYNCHAIN_DUMP, true);
 		ObjectOutputStream ow = new ObjectOutputStream(fw);
@@ -291,7 +317,7 @@ public class Util {
 
 				oi = new ObjectInputStream(fw);
 				Object object = oi.readObject();
-				logger.trace(object + "\n");
+				logger.debug(object + "\n");
 			}
 		} catch (EOFException e) {
 			logger.error("END OF FILE REACHED\n");
@@ -300,4 +326,5 @@ public class Util {
 		}
 
 	}
+
 }

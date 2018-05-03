@@ -4,27 +4,28 @@ import java.io.Serializable;
 
 import com.google.gson.JsonElement;
 
-public class Vout implements Serializable{
+public class Vout implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 124124493252327744L;
 
-	float value;
-
-	int n;
-
-	ScriptPubKey scriptPubKey = new ScriptPubKey();
+	float value = -1f;
+	int n = -1;
+	ScriptPubKey scriptPubKey=new ScriptPubKey();
 
 	public Vout() {
+		this.value = -1f;
+		this.n = -1;
 	}
 
-	public Vout(JsonElement value, JsonElement n, ScriptPubKey scriptPubKey) {
+	public Vout(JsonElement value, JsonElement n) {
 		super();
-		this.value = Float.valueOf(value.toString());
-		this.n = Integer.valueOf(n.toString());
-		this.scriptPubKey = scriptPubKey;
+		if (value != null)
+			this.value = Float.valueOf(value.toString());
+		if (n != null)
+			this.n = Integer.valueOf(n.toString());
 	}
 
 	public int getN() {

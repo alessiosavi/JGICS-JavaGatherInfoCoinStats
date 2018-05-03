@@ -82,8 +82,7 @@ public class Main {
 			throws InterruptedException, IOException, ClassNotFoundException {
 		// this var will be the block that contains the number of block that every
 		// thread have to download at every iteratio.
-
-		int start, stop = 1;
+		int start, stop = 8000;
 
 		if (moreBlocks != 0) {
 			stop = moreBlocks;

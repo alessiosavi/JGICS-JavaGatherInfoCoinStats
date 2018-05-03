@@ -184,12 +184,18 @@ public class Util {
 				List<String> addressList = new ArrayList<String>();
 				Vout vout = new Vout(data.getAsJsonObject().get("value"), data.getAsJsonObject().get("n"));
 				JsonElement scriptPubKeyJson = data.getAsJsonObject().get("scriptPubKey");
+				logger.trace("TX -> " + tx.getTxId());
 				ScriptPubKey scriptPubKey = new ScriptPubKey(scriptPubKeyJson.getAsJsonObject().get("asm"),
 						scriptPubKeyJson.getAsJsonObject().get("hex"),
 						scriptPubKeyJson.getAsJsonObject().get("reqSigs"),
 						scriptPubKeyJson.getAsJsonObject().get("type"));
-				for (JsonElement address : scriptPubKeyJson.getAsJsonObject().get("addresses").getAsJsonArray()) {
-					addressList.add(address.toString().replace("\"", ""));
+				try {
+					for (JsonElement address : scriptPubKeyJson.getAsJsonObject().get("addresses").getAsJsonArray()) {
+						addressList.add(address.toString().replace("\"", ""));
+					}
+				} catch (NullPointerException nonMiGuardare) {
+					// The block related to this transaction have a signature
+					logger.error("[******* NONSTANDARD_TX *******] NONSTANDARD TX -> " + tx.getTxId());
 				}
 				scriptPubKey.setAddresses(addressList);
 				vout.setScriptPubKey(scriptPubKey);
